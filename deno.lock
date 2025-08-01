@@ -1,0 +1,16 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:std@~0.1.40": "0.1.40"
+  },
+  "npm": {
+    "std@0.1.40": {
+      "integrity": "sha512-wUf57hkDGCoVShrhPA8Q7lAg2Qosk+FaMlECmAsr1A4/rL2NRXFHQGBcgMUFKVkPEemJFW9gzjCQisRty14ohg=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:std@~0.1.40"
+    ]
+  }
+}
