@@ -1,31 +1,46 @@
-const makeHandler = (
-  host: string,
-  key: string,
-  headerName: string | undefined,
-  bodyKey: string | undefined,
-) =>
+// handler.ts
+
+import { addHeader, modifyBody } from "./request-mutators/index.ts";
+
+export type MakeHandlerArg = {
+  host: string;
+  key: string;
+  headerName?: string | undefined;
+  bodyKey?: string | undefined;
+};
+
+const makeHandler = ({
+  host,
+  key,
+  headerName,
+  bodyKey,
+}: MakeHandlerArg) =>
   async function handler(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const targetUrl = `${host}${url.pathname}${url.search}`;
 
     console.log(`[Proxy] Forwarding ${req.method} request to: ${targetUrl}`);
 
-    const headers = new Headers(req.headers);
+    let headers = new Headers(req.headers);
+
+    let body: BodyInit | Error | null | undefined = req.body;
+
+    if (headerName) {
+      headers = addHeader({
+        req: req,
+        apiKeyValue: key,
+        headerKeyName: headerName,
+      });
+    } else if (bodyKey) {
+      body = await modifyBody({ req, bodyKeyName: bodyKey, apiKeyValue: key });
+
+      if (body instanceof Error) {
+        console.error(body);
+      }
+    }
+
     headers.delete("host");
     headers.delete("content-length");
-
-      let body: BodyInit | Error | null | undefined = req.body;
-
-    if (!!headerName){
-        // TODO
-    }
-    else {
-        body = await modifyBody(req, bodyKey, key);
-
-        if (body instanceof Error) {
-            console.error(body);
-        }
-    }
 
     try {
       return await fetch(targetUrl, {
@@ -41,43 +56,5 @@ const makeHandler = (
       );
     }
   };
-
-const modifyBody = async function (
-  req: Request,
-  bodyKeyName: string | undefined,
-  apiKeyValue: string
-) : Promise<BodyInit | Error | undefined> {
-
-  let body: BodyInit | null = req.body;
-
-  const canModifyBody = (req.method === "POST" || req.method === "PUT") &&
-    req.headers.get("content-type")?.includes("application/json");
-
-  let retVal: BodyInit | Error | undefined;
-
-  if (canModifyBody && !!bodyKeyName) {
-    try {
-      const originalPayload = await req.json();
-
-      const modifiedPayload = {
-        ...originalPayload,
-        [bodyKeyName]: apiKeyValue,
-      };
-
-      body = JSON.stringify(modifiedPayload);
-      console.log("[Proxy] Modified request body to include secret.");
-
-      retVal = body;
-    } catch (error) {
-      console.error(
-        "[Proxy] Could not parse JSON body, forwarding as-is.",
-        (error as Error).message,
-      );
-      retVal = error as Error;
-    }
-  }
-
-  return retVal;
-};
 
 export { makeHandler };
