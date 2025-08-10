@@ -15,7 +15,7 @@ jobs:
         with:
           deno-version: v2.x
       - run: deno lint
-      - run: deno run -A https://deno.land/x/udd/main.ts src/deno.json
+      - run: deno run -A https://deno.land/x/udd/main.ts src/deno.json src/*.ts
   
   sast:
     runs-on: ubuntu-latest
@@ -36,5 +36,5 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
       - name: GitLeaks
         run: |
-          git config --global --add safe.directory /__w/black-hole/black-hole
+          git config --global --add safe.directory /__w/secret-enriching-proxy/secret-enriching-proxy
           gitleaks detect --verbose

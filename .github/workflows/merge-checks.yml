@@ -33,7 +33,6 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
       - name: GitLeaks
         run: |
-          git config --global --add safe.directory /__w/black-hole/black-hole
+          git config --global --add safe.directory /__w/secret-enriching-proxy/secret-enriching-proxy
           gitleaks detect --verbose
     
-      
