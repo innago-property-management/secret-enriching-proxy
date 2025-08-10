@@ -19,5 +19,21 @@ jobs:
         with:
           deno-version: ${{ matrix.deno-version }}
 
-      - name: Run tests
-        run: deno test src/ --allow-read --allow-net --allow-env
+      - name: Run tests and collect coverage
+        run: deno test src/ --allow-read --allow-net --allow-env --coverage=coverage
+
+      - name: Generate LCOV report
+        run: deno coverage ./coverage --lcov --output=coverage.lcov
+
+      - name: Add coverage summary to job summary
+        if: always()
+        run: |
+          echo "### Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          npx lcov-summary coverage.lcov >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-lcov
+          path: coverage.lcov
