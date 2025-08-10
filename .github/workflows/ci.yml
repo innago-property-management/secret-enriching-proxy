@@ -36,4 +36,4 @@ jobs:
       - security
     with:
       version: ${{ needs.version.outputs.version }}
-      imageName: ${{ toLower(github.event.repository.name) }}
+      imageName: ${{ toLowerCase(github.event.repository.name) }}
