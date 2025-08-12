@@ -17,7 +17,13 @@ const makeHandler = ({
 }: MakeHandlerArg) =>
   async function handler(req: Request): Promise<Response> {
     const url = new URL(req.url);
-    const targetUrl = `${host}${url.pathname}${url.search}`;
+
+      if (url.pathname.endsWith("healthz")) {
+          return new Response("OK", { status: 200 });
+      }
+
+
+      const targetUrl = `${host}${url.pathname}${url.search}`;
 
     console.log(`[Proxy] Forwarding ${req.method} request to: ${targetUrl}`);
 
