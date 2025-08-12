@@ -8,7 +8,7 @@ RUN addgroup --gid 10001 notroot \
 
 WORKDIR /app
 
-COPY src/main.ts src/handler.ts ./
+COPY src/ ./
 
 USER notroot:notroot
 ENV PORT=8080
